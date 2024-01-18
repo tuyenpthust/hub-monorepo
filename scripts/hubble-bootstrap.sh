@@ -8,6 +8,8 @@ REPO="farcasterxyz/hub-monorepo"
 RAWFILE_BASE="https://raw.githubusercontent.com/$REPO"
 LATEST_TAG="@latest"
 SCRIPT_FILE_PATH="scripts/hubble.sh"
+INSTALL_LOCATION="~/hubble1"
+HUBBLE_FILE="~/hubble.sh"
 
 install_jq() {
     if command -v jq >/dev/null 2>&1; then
@@ -69,19 +71,24 @@ fetch_file_from_repo() {
 
 do_bootstrap() {
     # Make the ~/hubble directory if it doesn't exist
-    mkdir -p ~/hubble
+    mkdir -p $INSTALL_LOCATION
     
-    local tmp_file
-    tmp_file=$(mktemp)
-    fetch_file_from_repo "$SCRIPT_FILE_PATH" "$tmp_file"
+    # local tmp_file
+    # tmp_file=$(mktemp)
+    # fetch_file_from_repo "$SCRIPT_FILE_PATH" "$tmp_file"
+    #download file ourself
 
-    mv "$tmp_file" ~/hubble/hubble.sh
-    chmod +x ~/hubble/hubble.sh
+    # mv "$tmp_file" ~/hubble/hubble.sh
+    mv $HUBBLE_FILE $INSTALL_LOCATION/hubble.sh
+    chmod +x $INSTALL_LOCATION/hubble.sh
 
     # Run the hubble.sh script
-    cd ~/hubble
+    cd $INSTALL_LOCATION
     exec ./hubble.sh "upgrade" < /dev/tty
 }
+
+$HUBBLE_FILE="$1"
+$INSTALL_LOCATION="$2"
 
 # Install jq
 install_jq

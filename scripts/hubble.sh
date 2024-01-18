@@ -115,13 +115,13 @@ self_upgrade() {
 # Fetch the docker-compose.yml and grafana-dashboard.json files
 fetch_latest_docker_compose_and_dashboard() {    
     fetch_file_from_repo "$DOCKER_COMPOSE_FILE_PATH" "docker-compose.yml" 
-    fetch_file_from_repo "$GRAFANA_DASHBOARD_JSON_PATH" "grafana-dashboard.json"
-    mkdir -p grafana
-    chmod 777 grafana
-    fetch_file_from_repo "$GRAFANA_INI_PATH" "grafana/grafana.ini"
-    mkdir -p envoy
-    chmod 777 envoy
-    fetch_file_from_repo "$ENVOY_CONFIG_PATH" "envoy/envoy.yaml"
+    # fetch_file_from_repo "$GRAFANA_DASHBOARD_JSON_PATH" "grafana-dashboard.json"
+    # mkdir -p grafana
+    # chmod 777 grafana
+    # fetch_file_from_repo "$GRAFANA_INI_PATH" "grafana/grafana.ini"
+    # mkdir -p envoy
+    # chmod 777 envoy
+    # fetch_file_from_repo "$ENVOY_CONFIG_PATH" "envoy/envoy.yaml"
 }
 
 validate_and_store() {
@@ -183,6 +183,18 @@ write_env_file() {
 
     if ! key_exists "FC_NETWORK_ID"; then
         echo "FC_NETWORK_ID=1" >> .env
+    fi
+
+    if ! key_exists "HTTPAPI_PORT"; then
+        echo "HTTPAPI_PORT=2281" >> .env
+    fi
+
+    if ! key_exists "GOSSIP_PORT"; then
+        echo "GOSSIP_PORT=2282" >> .env
+    fi
+
+    if ! key_exists "RPC_PORT"; then
+        echo "RPC_PORT=2283" >> .env
     fi
 
     if ! key_exists "STATSD_METRICS_SERVER"; then
@@ -497,7 +509,8 @@ if [ "$1" == "up" ]; then
     set_compose_command
 
     # Run docker compose up -d hubble
-    $COMPOSE_CMD up -d hubble statsd grafana
+    # $COMPOSE_CMD up -d hubble statsd grafana
+    $COMPOSE_CMD up -d hubble
 
     echo "✅ Hubble is running."
 
@@ -548,7 +561,7 @@ if [ "$1" == "upgrade" ]; then
     fetch_latest_docker_compose_and_dashboard
 
     # Setup the Grafana dashboard
-    setup_grafana
+    # setup_grafana
 
     setup_identity
 
@@ -595,7 +608,7 @@ if [ "$1" == "autoupgrade" ]; then
     # Upgrade this script itself, fetch the latest docker-compose.yml, and restart the containers
     self_upgrade "$@"
     fetch_latest_docker_compose_and_dashboard
-    ensure_grafana
+    # ensure_grafana
     start_hubble
     sleep 5
     cleanup
